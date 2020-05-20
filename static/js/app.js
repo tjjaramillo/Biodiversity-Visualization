@@ -1,24 +1,21 @@
-//setInterval(location.reload(),2000)
+
 url = "data/samples.json"
-//parameter that consideres plotting new charts or restyling already existing ones
+//Plot new charts or modify existing one if there
 var firstLoad = true;
 var dataSource
-// get data
+//Obtain data from json file
 d3.json(url).then(data => {
     dataSource = data
 
-    //initial chart display
+    //Beginning chart display shows first subject
     var id = "940"
     populateMetadata(id, data.metadata)
-
     firstLoad = plotCharts(id, data, firstLoad)
-
     idList = data.names
-    
     dropDownList(idList)
 })
 
-// Plot the bar chart
+//Bar Chart
 function plotCharts(id, inputData, load){
     samplesData = inputData.samples
     //return the data corresponding to the id
@@ -32,29 +29,21 @@ function plotCharts(id, inputData, load){
     })
 
 
-    //sort by sample values
+    //Sort by values from sample
     idData.sort(function (firstEl, secondEl){
         return secondEl.sample_value - firstEl.sample_value
     })
-
-    // //select just first 10 values
-    // var dataToPlot = []
-    // for (let i = 0; i < 10; i++) {
-    //     dataToPlot[i] = idData[i]
-    // }
-
-    //select just first 10 values
     var dataToPlot = []
     let i = 0
     while (i < 10 && idData[i] != undefined) {
         dataToPlot[i] = idData[i]
         i+=1
     }
-    // sort data to plot in descending order
+    //Sort data in descending order for plotting
     dataToPlot.sort(function (firstEl, secondEl){
         return firstEl.sample_value - secondEl.sample_value
     })
-    // Plot Bar Chart
+    //Bar Chart
     if (load === true) {
         
         var trace1 = {
@@ -66,9 +55,9 @@ function plotCharts(id, inputData, load){
         };
         let dataBar = [trace1];
         let layoutBar = {
-            //title: "'Bar' Chart",
+            
             xaxis: { 
-                title: "sample values",
+                title: "Bacteria Count",
             },
         };  
 
@@ -82,7 +71,7 @@ function plotCharts(id, inputData, load){
     }
 
     
-    //plot bubble chart
+    //Bubble Chart
     if (load === true) {
         var trace1 = {
             y: idData.map(item => item.sample_value),
@@ -98,10 +87,9 @@ function plotCharts(id, inputData, load){
         let dataBubble = [trace1];
         
         let layoutBubble = {
-            //title: 'Marker Size',
             showlegend: false,
             xaxis: { 
-                title: "OTU ID",
+                title: "Operational Taxonomic Unit (OTU) ID",
             },
         };
         Plotly.newPlot('bubble', dataBubble, layoutBubble);
@@ -113,7 +101,8 @@ function plotCharts(id, inputData, load){
         Plotly.restyle("bubble","y",[y]);
     }
 
-    //Plot gauge (source: https://codepen.io/plotly/pen/rxeZME)
+    //Plot Gauge
+    //source: https://codepen.io/plotly/pen/rxeZME
     //Get scrubs per week
     var bellyBtnFreq = 0
     inputData.metadata.forEach(row=>{
@@ -123,14 +112,14 @@ function plotCharts(id, inputData, load){
     // Display the level on the chart
     var level = bellyBtnFreq/9*180;
 
-    // Trig to calc meter point
+    // Trig to calculate meter point
     var degrees = 180 - level,
         radius = .5;
     var radians = degrees * Math.PI / 180;
     var x = radius * Math.cos(radians);
     var y = radius * Math.sin(radians);
 
-    // Path: may have to change to create a better triangle
+    // Path for gauge triangle
     var mainPath = 'M -.0 -0.025 L .0 0.025 L ',
         pathX = String(x),
         space = ' ',
@@ -186,7 +175,7 @@ function plotCharts(id, inputData, load){
     return false
 }
 
-//populate dropdown list
+//Populate dropdown list with subjects
 function dropDownList(list) {
     var selection = d3.select("#selDataset")
         .selectAll("option")
@@ -222,8 +211,7 @@ function populateMetadata(id, metadata){
 }
 
 
-//Ai ramas aici
-//return value from dropdown
+//Activate change with dropdown selection
 d3.select("#selDataset").on("change", function(){
     populateMetadata(this.value, dataSource.metadata)
     plotCharts(this.value, dataSource, firstLoad)
