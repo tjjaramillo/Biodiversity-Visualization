@@ -1,9 +1,8 @@
-
-url = "data/samples.json"
 //Plot new charts or modify existing one if there
 var firstLoad = true;
 var dataSource
 //Obtain data from json file
+url = "data/samples.json"
 d3.json(url).then(data => {
     dataSource = data
 
